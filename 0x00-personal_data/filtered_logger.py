@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Module that handles the filtering of 
+"""Module that handles the filtering of
 Personal data logs
 """
 
@@ -10,12 +10,12 @@ import mysql.connector
 from typing import List
 
 
-## PII filed to be redated
+# PII filed to be redated
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 match_pat = {
         'extract': lambda x, y: r'(?P<field>{})=[^{}]*'.format('|'.join(x), y),
         'replace': lambda x: r'\g<field>={}'.format(x),
-        }
+}
 
 
 def filter_datum(
@@ -35,7 +35,7 @@ def filter_datum(
         The filtered log message with redacted values
     """
     extract, replace = (match_pat["extract"], match_pat["replace"])
-    return re.sub(extract(field, separator), replace(redaction), message)
+    return re.sub(extract(fields, separator), replace(redaction), message)
 
 
 def get_logger() -> logging.Logger:
@@ -50,8 +50,8 @@ def get_logger() -> logging.Logger:
     logger.setLevel(logging.INFO)
     logger.propagate = False
 
-    stream_handler = ogging.StreamHandler()
-    stream_handler.setFormatter(RedactingFormatter(list(PII_FIELDS)))
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(RedactingFormatter(PII_FIELDS))
     logger.addHandler(stream_handler)
 
     return logger
@@ -69,14 +69,13 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     db_name = os.getenv("PERSONAL_DATA_DB_NAME", "")
     username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
     db_pwd = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
-    conexn = mysql.connector.connection.MySQLConnection(
+    conxn = mysql.connector.connect(
             host=host,
-            port=3306,
             user=username,
             password=db_pwd,
             database=db_name,
-            )
-    return conexn
+    )
+    return conxn
 
 
 def main():
@@ -84,23 +83,25 @@ def main():
     Main function that retrieves user data from the database
     and log to the console
     """
-   fields = "name,email,phone,ssn,password,ip,last_login,user_agent"
+    fields = "name,email,phone,ssn,password,ip,last_login,user_agent"
     columns = fields.split(',')
-    query = "SELECT {} FROM users;".format(fields)
-    info_logger = get_logger()
-    connection = get_db()
-    with connection.cursor() as cursor:
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        for row in rows:
+    quest = f"SELECT {fields} FROM users;"
+    logger_info = get_logger()
+    db = get_db()
+    with db.cursor() as cursor:
+        cursor.execute(quest)
+        all_rows = cursor.fetchall()
+        for row in all_rows:
             record = map(
-                    lambda x: '{}={}'.format(x[0], x[1]),
-                    zip(columns, row),
-                    )
+                lambda x: '{}={}'.format(x[0], x[1]),
+                zip(columns, row),
+            )
             msg = '{};'.format('; '.join(list(record)))
-            args = ("user_data", logging.INFO, None, None, msg, None, None)
-            log_record = logging.LogRecord(*args)
-            info_logger.handle(log_record)
+            pars = ("user_data", logging.INFO, None, None, msg, None, None)
+            log_record = logging.LogRecord(*pars)
+            logger_info.handle(log_record)
+        cursor.close()
+        db.close()
 
 
 class RedactingFormatter(logging.Formatter):
@@ -117,11 +118,10 @@ class RedactingFormatter(logging.Formatter):
         self.fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
-        """formats a LogRecord.
+        """format LogRecord.
         """
         msg = super(RedactingFormatter, self).format(record)
-        txt = filter_datum(self.fields, self.REDACTION, msg, self.SEPARATOR)
-        return txt
+        return filter_datum(self.fields, self.REDACTION, msg, self.SEPARATOR)
 
 
 if __name__ == "__main__":
