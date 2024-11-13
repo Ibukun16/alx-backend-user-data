@@ -50,31 +50,30 @@ class BasicAuth(Auth):
             except Exception:
                 return None
 
-
     def extract_user_credentials(
-            self, decoded_base64_authorization_header: str,
+            self, decoded_base64_authorization_header: str
             ) -> Tuple[str, str]:
-            """Get user details from a base64-decoded authorization header
-            that uses Basic authentication flow
-            
-            Args:
-                self (_type_): _description_
-            """
-            if decoded_base64_authorization_header is None:
-                return (None, None)
-            if not isinstance(decoded_base64_authorization_header, str):
-                return (None, None)
-            if ':' not in decoded_base64_authorization_header:
-                return (None, None)
-            if isinstance(decoded_base64_authorization_header, str):
-                lnk = r'(?P<user>[^:]+):(?P<password>.+)'
-                mch = re.fullmatch(
-                        lnk, decoded_base64_authorization_header.strip())
-                if mch is not None:
-                    user = mch.group('user')
-                    password = mch.group('password')
-                    return user, password
-                return (None, None)
+        """Get user details from a base64-decoded authorization header
+        that uses Basic authentication flow
+
+        Args:
+            self (_type_): _description_
+        """
+        if decoded_base64_authorization_header is None:
+            return (None, None)
+        if not isinstance(decoded_base64_authorization_header, str):
+            return (None, None)
+        if ':' not in decoded_base64_authorization_header:
+            return (None, None)
+        if isinstance(decoded_base64_authorization_header, str):
+            lnk = r'(?P<user>[^:]+):(?P<password>.+)'
+            mch = re.fullmatch(
+                    lnk, decoded_base64_authorization_header.strip())
+            if mch is not None:
+                user = mch.group('user')
+                password = mch.group('password')
+                return user, password
+            return (None, None)
 
     def user_object_from_credentials(self, user_email: str, user_pwd: str,
                                      ) -> TypeVar('User'):
