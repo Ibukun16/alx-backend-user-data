@@ -27,13 +27,16 @@ class Auth:
                 bool: _description_
         """
         if path is not None and excluded_paths is not None:
-            if path[-1] != '/':
-                path += '/'
-            for exclusive_path in excluded_paths:
-                if exclusive_path.endswith('*'):
-                    if exclusive_path.startswith(p[:1]):
-                        return False
-            return False if path in excluded_paths else True
+            for exclude in map(lambda x: x.strip(), excluded_paths):
+                fmt = ''
+                if exclude[-1] == '*':
+                    fmt ='{}.*'.format(exclude[0:-1])
+                elif exclude[-1] == '/':
+                    fmt = '{}/*'.format(exclude[0:-1])
+                else:
+                    fmt = '{}/*'.format(exclude)
+                if re.match(fmt, path):
+                    return False
         return True
 
     def authorization_header(self, request=None) -> str:
