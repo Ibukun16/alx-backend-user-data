@@ -34,7 +34,7 @@ class BasicAuth(Auth):
         return None
 
     def decode_base64_authorization_header(self, base64_authorization: str,
-            ) -> str:
+                                           ) -> str:
         """Decode a base64-encoded authorization header
 
         Args:
@@ -46,13 +46,14 @@ class BasicAuth(Auth):
         if isinstance(base64_authorization_header, str):
             try:
                 rsp = base64.b64decode(base64_authorization_header,
-                        validate=True)
+                                       validate=True)
                 return rsp.decode("utf-8")
             except (binascii.Error, UnicodeDecodeError):
                 return None
 
+
 def extract_user_credentials(self, decode_base64_authorization_header: str,
-        ) -> Tuple[str, str]:
+                             ) -> Tuple[str, str]:
     """Extract user details from a base64-decoded authorization header
     that uses Basic authentication flow
 
@@ -61,17 +62,15 @@ def extract_user_credentials(self, decode_base64_authorization_header: str,
     """
     if isinstance(decoded_base64_authorization_header, str):
         lnk = r'(?P<user>[^:]+):(?P<password>.+)'
-        match_field = re.fullmatch(lnk,
-                decoded_base64_authorization_header.strip())
-        if match_field is not None:
-            user = match_field.group('user')
-            password = match_field.group('password')
+        mch = re.fullmatch(lnk, decoded_base64_authorization_header.strip())
+        if mch is not None:
+            user = mch.group('user')
+            password = mch.group('password')
             return user, password
         return None, None
 
-
     def user_object_from_credentials(self, user_email: str, user_pwd: str,
-            ) -> TypeVar('User'):
+                                     ) -> TypeVar('User'):
         """Retrieves a user based on the user's authentication credentials.
         """
         if isinstance(user_email, str) and isinstance(user_pwd, str):
