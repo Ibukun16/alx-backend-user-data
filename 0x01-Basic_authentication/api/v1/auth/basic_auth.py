@@ -91,11 +91,12 @@ def extract_user_credentials(self, decode_base64_authorization_header: str,
         """
         auth_header = self.authorization_header(request)
         if auth_header is not None:
-            auth_token = self.extract_base64_authorization_header(auth_header)
+            autoken = self.extract_base64_authorization_header(auth_header)
             if auth_header is not None:
-                auth_decod = self.decode_base64_authorization_header(auth_token)
+                auth_decod = self.decode_base64_authorization_header(autoken)
                 if auth_decod is not None:
                     email, password = self.extract_user_credentials(auth_decod)
                     if email is not None:
-                        return self.user_object_from_credentials(email, password)
+                        return self.user_object_from_credentials(email,
+                                                                 password)
         return
