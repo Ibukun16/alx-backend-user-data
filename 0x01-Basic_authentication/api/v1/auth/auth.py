@@ -30,7 +30,7 @@ class Auth:
             for exclude in map(lambda x: x.strip(), excluded_paths):
                 fmt = ''
                 if exclude[-1] == '*':
-                    fmt ='{}.*'.format(exclude[0:-1])
+                    fmt = '{}.*'.format(exclude[0:-1])
                 elif exclude[-1] == '/':
                     fmt = '{}/*'.format(exclude[0:-1])
                 else:
