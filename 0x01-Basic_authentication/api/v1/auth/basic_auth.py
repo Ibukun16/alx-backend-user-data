@@ -90,7 +90,12 @@ def extract_user_credentials(self, decode_base64_authorization_header: str,
             self (_type_): _description_
         """
         auth_header = self.authorization_header(request)
-        b64_auth_token = self.extract_base64_authorization_header(auth_header)
-        auth_token = self.decode_base64_authorization_header(b64_auth_token)
-        email, password = self.extract_user_credentials(auth_token)
-        return self.user_object_from_credentials(email, password)
+        if auth_header is not None:
+            auth_token = self.extract_base64_authorization_header(auth_header)
+            if auth_header is not None:
+                auth_decod = self.decode_base64_authorization_header(auth_token)
+                if auth_decod is not None:
+                    email, password = self.extract_user_credentials(auth_decod)
+                    if email is not None:
+                        return self.user_object_from_credentials(email, password)
+        return
