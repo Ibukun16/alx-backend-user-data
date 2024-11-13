@@ -27,16 +27,13 @@ class Auth:
                 bool: _description_
         """
         if path is not None and excluded_paths is not None:
-            for exclusive_path in map(lambda x: x.strip(), excluded_paths):
-                pat_match = ''
-                if exclusive_path[-1] == '*':
-                    pat_match = '{}.*'.format(exclusive_path[0:-1])
-                elif exclusive_path[-1] == '/':
-                    pat_match ='{}/*'.format(exclusive_path[0:-1])
-                else:
-                    pat_match = '{}/*'.format(exclusive_path)
-                if re.match(pat_match, path):
-                    return False
+            if path[-1] != '/':
+                path += '/'
+            for exclusive_path in excluded_paths:
+                if exclusive_path.endswith('*'):
+                    if exclusive_path.startswith(p[:1]):
+                        return False
+            return False if path in excluded_paths else True
         return True
 
     def authorization_header(self, request=None) -> str:
@@ -56,4 +53,3 @@ class Auth:
         """Get the current user details from the request
         """
         return None
-
