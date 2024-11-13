@@ -51,22 +51,23 @@ class BasicAuth(Auth):
                 return None
 
 
-def extract_user_credentials(self, decode_base64_authorization_header: str,
-                             ) -> Tuple[str, str]:
-    """Extract user details from a base64-decoded authorization header
-    that uses Basic authentication flow
-
-    Args:
-        self (_type_): _description_
-    """
-    if isinstance(decoded_base64_authorization_header, str):
-        lnk = r'(?P<user>[^:]+):(?P<password>.+)'
-        mch = re.fullmatch(lnk, decoded_base64_authorization_header.strip())
-        if mch is not None:
-            user = mch.group('user')
-            password = mch.group('password')
-            return user, password
-        return None, None
+    def extract_user_credentials(
+            self, decode_base64_authorization_header: str) -> Tuple[str, str]:
+            """Extract user details from a base64-decoded authorization header
+            that uses Basic authentication flow
+            
+            Args:
+                self (_type_): _description_
+            """
+            if isinstance(decoded_base64_authorization_header, str):
+                lnk = r'(?P<user>[^:]+):(?P<password>.+)'
+                mch = re.fullmatch(
+                        lnk, decoded_base64_authorization_header.strip())
+                if mch is not None:
+                    user = mch.group('user')
+                    password = mch.group('password')
+                    return user, password
+                return None, None
 
     def user_object_from_credentials(self, user_email: str, user_pwd: str,
                                      ) -> TypeVar('User'):
