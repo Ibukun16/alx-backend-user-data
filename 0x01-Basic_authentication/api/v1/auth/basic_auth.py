@@ -5,7 +5,6 @@
 
 import re
 import base64
-import binascii
 from typing import Tuple, TypeVar
 from api.v1.auth.auth import Auth
 
@@ -45,10 +44,10 @@ class BasicAuth(Auth):
         """
         if isinstance(base64_authorization_header, str):
             try:
-                rsp = base64.b64decode(base64_authorization_header,
-                                       validate=True)
-                return rsp.decode("utf-8")
-            except (binascii.Error, UnicodeDecodeError):
+                decodeit = base64_authorization_header.encode('utf-8')
+                rsp = base64.b64decode(decodeit, validate=True)
+                return rsp.decode('utf-8')
+            except Exception:
                 return None
 
 
