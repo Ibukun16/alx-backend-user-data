@@ -25,15 +25,15 @@ class BasicAuth(Auth):
         """Extract the Base64 part of the Authorization header
         for a Basic Authentication.
         """
-        if type(authorization_header) == str:
+        if isinstance(authorization_header, str):
             pat = r'Basic (?P<token>.+)'
             match_field = re.fullmatch(pat, authorization_header.strip())
             if match_field is not None:
                 return match_field.group('token')
         return None
 
-    def decode_base64_authorization_header(self, base64_authorization: str,
-                                           ) -> str:
+    def decode_base64_authorization_header(
+            self, base64_authorization_header: str) -> str:
         """Decode a base64-encoded authorization header
 
         Args:
