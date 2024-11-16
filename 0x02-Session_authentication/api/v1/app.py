@@ -11,6 +11,7 @@ from flask_cors import (CORS, cross_origin)
 from api.v1.views import app_views
 
 app = Flask(__name__)
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.register_blueprint(app_views)
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 auth = None
@@ -25,12 +26,12 @@ elif AUTH_TYPE == 'basic_auth':
 elif AUTH_TYPE == 'session_auth':
     from api.v1.auth.session_auth import SessionAuth
     auth = SessionAuth()
-elif AUTH_TYPE == 'session_exp_auth':
-    from api.v1.auth.session_exp_auth import SessionExpAuth
-    auth = SessionExpAuth
 elif AUTH_TYPE == 'session_db_auth':
     from api.v1.auth.session_db_auth import SessionDBAuth
-    auth = SessionDBAuth
+    auth = SessionDBAuth()
+elif AUTH_TYPE == 'session_exp_auth':
+    from api.v1.auth.session_exp_auth import SessionExpAuth
+    auth = SessionExpAuth()
 
 
 @app.before_request
