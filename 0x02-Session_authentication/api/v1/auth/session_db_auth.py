@@ -2,7 +2,6 @@
 """new authentication class SessionDBAuth
 that inherits from SessionExpAuth
 """
-from os import getenv
 from flask import request
 from datetime import datetime, timedelta
 from models.user_session import UserSession
