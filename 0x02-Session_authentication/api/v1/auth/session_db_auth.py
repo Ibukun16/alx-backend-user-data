@@ -24,8 +24,9 @@ class SessionDBAuth(SessionExpAuth):
                     'session_id': session_id,
                 }
                 user_session = UserSession(**kwargs)
-                user_session.save_to_file()
-            return session_id
+                user_session.save()
+                UserSession.save_to_file()
+                return session_id
 
     def user_id_for_session_id(self, session_id=None):
         """Retrieve the id of a user linked to a given session
@@ -39,7 +40,7 @@ class SessionDBAuth(SessionExpAuth):
             return None
         current_time = datetime.now()
         time_duration = timedelta(seconds=self.session_duration)
-        exp_time = user_sesn[0].created_at + time_span
+        exp_time = user_sesn[0].created_at + time_duration
         if exp_time < current_time:
             return None
         return user_sesn[0].user_id
@@ -48,7 +49,7 @@ class SessionDBAuth(SessionExpAuth):
         """Destroy a user session after completion
         based on the Session ID from the request cookie
         """
-        if request:
+        if request is not None:
             session_id = self.session_cookie(request)
         try:
             user_sesn = UserSession.search({'session_id': session_id})
