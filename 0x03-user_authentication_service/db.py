@@ -79,8 +79,8 @@ class DB:
         """Method that update user by taking as argument a required user_id
         integer and arbitrary keyword arguments, and returns None. Method
         uses find_user_by to locate the user to update, then update the user’s
-        attributes as passed in the method’s arguments and commit changes to the
-        database.
+        attributes as passed in the method’s arguments and commit changes to
+        the database.
 
         Args:
             User_id (int): id of user
