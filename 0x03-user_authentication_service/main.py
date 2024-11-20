@@ -25,7 +25,7 @@ def register_user(email: str, password: str) -> None:
 
 
 def log_in_wrong_password(email: str, password: str) -> None:
-    """A  function that test wrong log in 
+    """A  function that test wrong log in
     """
     url = f"{BASE_URL}/sessions"
     body = {'email': email, 'password': password}
@@ -79,7 +79,7 @@ def reset_password_token(email: str) -> str:
     """
     url = f"{BASE_URL}/reset_password"
     body = {'email': email}
-    resp =  requests.post(url, data=body)
+    resp = requests.post(url, data=body)
     assert resp.status_code == 200
     assert "email" in resp.json()
     assert resp.json()["email"] == email
@@ -87,14 +87,13 @@ def reset_password_token(email: str) -> str:
     return resp.json().get('reset_token')
 
 
-def update_password(email: str, reset_token: str, new_password:str) -> None:
+def update_password(email: str, reset_token: str, new_password: str) -> None:
     """A function that test updating user password
     """
     url = f"{BASE_URL}/reset_password"
     body = {'email': email,
             'reset_token': reset_token,
-            'new_password': new_password,
-    }
+            'new_password': new_password}
     resp = requests.put(url, data=body)
     assert resp.status_code == 200
     assert resp.json() == {"email": email, "message": "Password updated"}
