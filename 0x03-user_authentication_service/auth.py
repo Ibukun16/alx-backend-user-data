@@ -22,6 +22,14 @@ def _hash_password(password: str) -> bytes:
     """
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
+def _generate_uuid() -> str:
+    """Generate UUID
+
+    Return:
+            str: string output of the generated UUID
+    """
+    return str(uuid4())
+
 
 class Auth:
     """Auth class to interact with the authentication database.
@@ -47,3 +55,71 @@ class Auth:
             raise ValueError(f"User {email} already exists")
         except NoResultFound:
             return self._db.add_user(email, _hash_password(password))
+
+    def valid_login(self, email: str, password: str) -> bool:
+        """Method that validates user login
+
+        Args:
+            email (str): user's email
+            password (str): user's password
+
+        Return:
+                True if matches password else False
+        """
+        user = None
+        try:
+            user = self._db.find_user_by(email=email)
+        except NoResultFound:
+            return False
+        return bcrypt.checkpw(password.encode("utf-8"), user.hashed_password)
+
+    def create_session(self, email: str) -> str:
+        """Create a new session for a user
+
+        Args:
+            email (str): email of user
+
+        Return:
+                str: string output of the session ID
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+            session_id = _generate_uuid()
+            self._db.update_user(user.id, session_id=session_id)
+            return session_id
+        except NoResultFound:
+            return None
+
+    def get_user_from_session_id(self, session_id: str) -> Union[User, None]:
+        """Retrieve the details of a user based on a given session ID
+        
+        Args:
+            session_id (str): session id of user
+
+        Returns:
+            str: user email
+        """
+        user = None
+        if session_id is None:
+            return None
+        try:
+            user = self._db.find_user_by(session_id=session_id)
+            return user
+        except NoResultFound:
+            return None
+
+    def destroy_session(self, user_id: int) -> None:
+        """Destroy a completed session associated with a given user upon logout
+        
+        Args:
+            user_id (int): user id
+        """
+        try:
+            user = self._db.find_user_by(id=user_id)
+            self._db.update_user(user.id, session_id=None)
+        except NoResultFound:
+            return None
+
+
+    #def get_reset_password_token
+

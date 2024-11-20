@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DB module
+"""DataBase module
 """
 from typing import TypeVar
 from user import Base, User
