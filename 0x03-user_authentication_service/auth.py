@@ -120,4 +120,42 @@ class Auth:
             self._db.update_user(user.id, session_id=None)
         except NoResultFound:
             return None
-    # def get_reset_password_token
+
+    def get_reset_password_token(self, email: str) -> str:
+        """Generate password reset token for a given user
+
+        Args:
+            email (str): user email address
+
+        Return:
+                password rest token else Value error
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+            token = _generate_uuid()
+            self._db.update_user(user.id, reset_token=token)
+            return token
+        except NoResultFound:
+            raise ValueError
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """Method that update the user password from the
+        password reset token
+
+        Args:
+            reset_token (str): generated token
+            password (str): User password
+
+        Return:
+                User, else Value error and return None
+        """
+        user = None
+        try:
+            user = self._db.find_user_by(reset_token=reset_token)
+        except NoResultFound:
+            user = None
+        if user is None:
+            raise ValueError()
+        new_pwd_hash = _hash_password(password)
+        self._db.update_user(user.id, hashed_password=new_pwd_hash,
+                             reset_token=None)
