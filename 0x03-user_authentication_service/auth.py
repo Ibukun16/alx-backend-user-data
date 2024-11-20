@@ -22,6 +22,7 @@ def _hash_password(password: str) -> bytes:
     """
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
+
 def _generate_uuid() -> str:
     """Generate UUID
 
@@ -92,7 +93,7 @@ class Auth:
 
     def get_user_from_session_id(self, session_id: str) -> Union[User, None]:
         """Retrieve the details of a user based on a given session ID
-        
+
         Args:
             session_id (str): session id of user
 
@@ -110,7 +111,7 @@ class Auth:
 
     def destroy_session(self, user_id: int) -> None:
         """Destroy a completed session associated with a given user upon logout
-        
+
         Args:
             user_id (int): user id
         """
@@ -119,7 +120,4 @@ class Auth:
             self._db.update_user(user.id, session_id=None)
         except NoResultFound:
             return None
-
-
-    #def get_reset_password_token
-
+    # def get_reset_password_token
